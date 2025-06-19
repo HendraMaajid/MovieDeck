@@ -1,17 +1,21 @@
-import { HeartIcon as HeartOutlineIcon } from '@heroicons/react/24/outline'; // Outline Heart
-import { HeartIcon as HeartSolidIcon } from '@heroicons/react/24/solid';   // Solid Heart
+import { HeartIcon as HeartOutlineIcon } from '@heroicons/react/24/outline'; 
+import { HeartIcon as HeartSolidIcon } from '@heroicons/react/24/solid';   
+import { useState } from 'react'; 
 
-import { useState } from 'react'; // Kita butuh state untuk toggle hover/fav
-
-function MovieCard({ movie }) {
-  // Kita akan menggunakan state untuk mensimulasikan apakah movie ini favorit atau tidak
-  // Dalam aplikasi nyata, ini biasanya akan datang dari global state management (Context, Redux, dll)
+function MovieCard({ movie, genresMap }) {
   const [isFavorite, setIsFavorite] = useState(false); 
 
   const handleFavoriteClick = () => {
-    setIsFavorite(!isFavorite); // Toggle status favorit
-    // Anda bisa menambahkan logika untuk menyimpan status favorit ke backend/lokal storage di sini
+    setIsFavorite(!isFavorite); 
     console.log(`Movie ${movie.title} is now ${isFavorite ? 'not favorite' : 'favorite'}`);
+  };
+
+    // Fungsi untuk mendapatkan nama genre dari ID
+  const getGenreNames = (genreIds) => {
+      if (!genreIds || genreIds.length === 0 || !genresMap) {
+          return "N/A";
+      }
+      return genreIds.map(id => genresMap[id]).filter(name => name).join(', ');
   };
 
   return (
@@ -20,16 +24,16 @@ function MovieCard({ movie }) {
       {/* Movie Poster */}
       <div className="relative w-full h-48 sm:h-56 md:h-64 overflow-hidden">
         <img 
-          src={movie.url} 
+          src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`} 
           alt={`${movie.title} poster`} 
           className="w-full h-full object-cover object-center"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent opacity-50"></div>
       </div>
 
-      {/* Favorite Button - positioned absolutely within the main card container */}
+      {/* Favorite Button */}
       <button 
-        onClick={handleFavoriteClick} // Tambahkan onClick handler
+        onClick={handleFavoriteClick} 
         className={`
           absolute top-3 right-3 p-2 rounded-full shadow-md 
           transition-all duration-300 ease-in-out transform hover:scale-110 
@@ -38,22 +42,20 @@ function MovieCard({ movie }) {
         `}
       >
         {isFavorite ? (
-          // Jika favorit, tampilkan ikon hati solid
-          <HeartSolidIcon className="h-6 w-6 text-red-400" /> // Hati merah solid
+          <HeartSolidIcon className="h-6 w-6 text-red-400" /> 
         ) : (
-          // Jika tidak favorit, tampilkan ikon hati outline
-          <HeartOutlineIcon className="h-6 w-6 text-white group-hover:text-red-400 group-hover:fill-red-400" /> // Hati putih outline, jadi merah saat hover
+          <HeartOutlineIcon className="h-6 w-6 text-white group-hover:text-red-400 group-hover:fill-red-400" /> 
         )}
       </button>
 
       {/* Movie Info */}
       <div className="p-4 flex flex-col flex-grow">
         <h3 className="text-xl font-bold text-indigo-400 mb-2">{movie.title}</h3>
-        <p className="text-gray-300 text-sm mb-3 line-clamp-3">{movie.description}</p> 
+        <p className="text-gray-300 text-sm mb-3 line-clamp-3">{movie.overview}</p> 
         <div className="text-gray-400 text-sm mt-auto"> 
-          <p className="mb-1"><strong>Release Date:</strong> {movie.releaseDate}</p>
-          <p className="mb-1"><strong>Rating:</strong> <span className="font-semibold text-yellow-400">{movie.rating}</span></p>
-          <p><strong>Genre:</strong> {movie.genre}</p>
+          <p className="mb-1"><strong>Release Date:</strong> {movie.release_date}</p>
+          <p className="mb-1"><strong>Rating:</strong> <span className="font-semibold text-yellow-400">{movie.vote_average?.toFixed(1)}</span></p>
+          <p><strong>Genre:</strong> {getGenreNames(movie.genre_ids)}</p>
         </div>
       </div>
     </div>
