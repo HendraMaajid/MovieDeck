@@ -1,13 +1,17 @@
 import { HeartIcon as HeartOutlineIcon } from '@heroicons/react/24/outline'; 
 import { HeartIcon as HeartSolidIcon } from '@heroicons/react/24/solid';   
-import { useState } from 'react'; 
+import { useMovieContext } from '../contexts/MovieContext';
 
 function MovieCard({ movie, genresMap }) {
-  const [isFavorite, setIsFavorite] = useState(false); 
-
-  const handleFavoriteClick = () => {
-    setIsFavorite(!isFavorite); 
-    console.log(`Movie ${movie.title} is now ${isFavorite ? 'not favorite' : 'favorite'}`);
+  const {isFavorite, addFavorite, removeFavorite} = useMovieContext();
+  const favorite = isFavorite(movie.id);
+  const handleFavoriteClick = (e) => {
+      e.preventDefault()
+      if (favorite) {
+          removeFavorite(movie.id);
+      } else {
+          addFavorite(movie);
+      }
   };
 
     // Fungsi untuk mendapatkan nama genre dari ID
@@ -38,10 +42,10 @@ function MovieCard({ movie, genresMap }) {
           absolute top-3 right-3 p-2 rounded-full shadow-md 
           transition-all duration-300 ease-in-out transform hover:scale-110 
           focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 
-          z-10
+          z-10 bg-gray-700 hover:bg-gray-600 group
         `}
       >
-        {isFavorite ? (
+        {favorite ? (
           <HeartSolidIcon className="h-6 w-6 text-red-400" /> 
         ) : (
           <HeartOutlineIcon className="h-6 w-6 text-white group-hover:text-red-400 group-hover:fill-red-400" /> 
